@@ -1,0 +1,31 @@
+# Environment
+.env
+
+# Generated output
+scratch/
+applications/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Real template lives outside the repo — never commit it
+# Copy template/template.example.tex → template/template.tex and fill in personal info
+template/template.tex
+
+# Personal resume data — never commit it
+# Copy master.example.md → master.md and fill in your bullets
+master.md

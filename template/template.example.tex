@@ -1,0 +1,116 @@
+\documentclass[11pt,a4paper]{article} %DO NOT EDIT%
+
+% --- Packages ---%DO NOT EDIT%
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=0.6in]{geometry}
+\usepackage[scaled]{helvet}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+% --- Font ---%DO NOT EDIT%
+\renewcommand*\familydefault{\sfdefault}
+
+% --- Colors ---%DO NOT EDIT%
+\definecolor{titleblue}{RGB}{20, 30, 50}
+
+% --- Hyperlinks ---%DO NOT EDIT%
+\hypersetup{
+    colorlinks=true,
+    linkcolor=titleblue,
+    filecolor=magenta,
+    urlcolor=titleblue,
+    pdftitle={Your Full Name CV},
+}
+
+% --- Section Style --%DO NOT EDIT%
+\titleformat{\section}
+  {\large\bfseries\color{black}\raggedright}
+  {}{0em}{}
+  [{\color{black}\titlerule[0.7pt]}]
+\titlespacing*{\section}{0pt}{14pt}{8pt}
+
+% --- Shared itemize style ---%DO NOT EDIT%
+\setlist[itemize]{leftmargin=1.5em, topsep=2pt, itemsep=0pt, label=-}
+
+% --- Reusable commands ---%DO NOT EDIT%
+\newcommand{\projectheading}[1]{\noindent\textbf{\color{black}#1}}
+\newcommand{\dateright}[1]{\hfill\textbf{\color{black}#1}}
+\newcommand{\techstack}[1]{\textit{\color{gray!80}#1}}
+\newcommand{\projectlink}[2]{\href{#1}{\textbf{\color{titleblue}#2}}}
+\newcommand{\greylink}[2]{\href{#1}{\underline{\color{black}#2}}}
+
+% --- Document ---%DO NOT EDIT%
+\begin{document}
+\pagestyle{empty}
+
+% --- Header --- %DO NOT EDIT%
+\begin{center}
+    {\Huge\textbf{\color{titleblue}Your Full Name}} \\[4pt]
+
+    {\small
+        \href{https://www.linkedin.com/in/your-profile}{\underline{LinkedIn}} \enspace|\enspace
+        \href{https://github.com/your-username}{\underline{GitHub}} \enspace|\enspace
+        \href{https://your-website.com}{\underline{Blog}} \enspace|\enspace
+        \href{mailto:your.email@example.com}{\underline{your.email@example.com}} \enspace|\enspace
+        +XXX XXXXXXXXX \enspace|\enspace
+        City, Country
+    }
+\end{center}
+
+% --- Summary --- %% EDIT HERE%%
+\section*{Summary}
+Lorem Ipsum Engineer building custom \textbf{lorem orchestration harnesses} --- \textbf{ipsum-calling patterns}, \textbf{dolor sit amet}, and \textbf{ipsum-calling patterns} in production, ipsum cut \textbf{\textasciitilde85\%} via \textbf{dolor sit amet validation}.
+
+% --- Work Experience ---%EDIT HERE% ONLY AI ENGINEER . EACH BULLET MUST NOT EXCEED 200 CHARS
+\section*{Technical Experience}
+\projectheading{AI Engineer} \dateright{Mon YYYY - Present} \\
+\techstack{Your Company}
+\begin{itemize}
+       \item Lorem Ipsum is simply dummy text of the \textbf{printing} and typesetting industry. Lorem Ipsum has \textbf{been} the industry's standard dummy text ever since the Lorem Ipsum has \textbf{been} the industry's standard dummy text
+      \item Lorem Ipsum is simply dummy text of the \textbf{printing} and typesetting industry. Lorem Ipsum has \textbf{been} the industry's standard dummy text ever since the Lorem Ipsum has \textbf{been} the industry's standard dummy text
+\end{itemize}
+
+\projectheading{Previous Role} \dateright{Mon YYYY - Mon YYYY} \\ % DO NOT EDIT%
+\techstack{Your Company}
+\begin{itemize}
+       \item Bullet describing a concrete achievement with a \textbf{quantified result} in a production environment.
+      \item Bullet describing a second achievement demonstrating \textbf{technical ownership} and reliability.
+\end{itemize}
+
+% --- Projects ---%%EDIT HERE%  EACH BULLET MUST NOT EXCEED 200 CHARS
+\section*{Projects}
+
+\projectheading{Mosaic RAG Pipeline} \hfill
+\greylink{https://your-demo-link.com}{Live Demo} |
+\greylink{https://github.com/your-username/mosaic}{GitHub} \\
+\techstack{FastAPI | ChromaDB | Sentence Transformers | Groq (Llama 3.3 70B) | Next.js 15}
+\begin{itemize}
+       \item Lorem Ipsum is simply dummy text of the \textbf{printing} and typesetting industry. Lorem Ipsum has \textbf{been} the industry's standard dummy text ever since the Lorem Ipsum has \textbf{been} the industry's standard dummy text
+      \item Lorem Ipsum is simply dummy text of the \textbf{printing} and typesetting industry. Lorem Ipsum has \textbf{been} the industry's standard dummy text ever since the Lorem Ipsum has \textbf{been} the industry's standard dummy text
+      \item Lorem Ipsum is simply dummy text of the \textbf{printing} and typesetting industry. Lorem Ipsum has \textbf{been} the industry's standard dummy text ever since the Lorem Ipsum has \textbf{been} the industry's standard dummy text
+\end{itemize}
+
+\vspace{6pt}
+
+% --- Technical Skills --- %
+\section*{Technical Skills}
+\noindent
+\textbf{Languages:} Python, JavaScript, TypeScript, SQL, Bash  \\
+\textbf{AI \& ML:} \\%EDIT HERE% EACH  MUST NOT EXCEED 200 CHARS
+\textbf{Concepts \& Tools:}%EDIT HERE% EACH  MUST NOT EXCEED 200 CHARS
+% --- Education ---
+\section*{Education}
+\projectheading{Your University} | \textit{B.S. in Your Degree} \dateright{YYYY -- YYYY} \\
+\techstack{Graduation Project: Your Project Title | Python | relevant-lib | relevant-lib}
+\begin{itemize}
+       \item Lorem Ipsum is simply dummy text of the \textbf{printing} and typesetting industry. Lorem Ipsum has \textbf{been} the industry's standard dummy text ever since the Lorem Ipsum has \textbf{been} the industry's standard dummy text %EDIT HERE% EACH  MUST NOT EXCEED 200 CHARS
+\end{itemize}
+
+% --- Languages ---
+\section*{Languages}
+\noindent\textbf{Your Language} (Native) | \textbf{English} (Your Level)
+
+\end{document}
