@@ -29,3 +29,7 @@ template/template.tex
 # Personal resume data — never commit it
 # Copy master.example.md → master.md and fill in your bullets
 master.md
+
+# Personal pipeline config — never commit it
+# Copy stitch.example.yaml → stitch.yaml and fill in your sections
+stitch.yaml

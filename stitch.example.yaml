@@ -1,0 +1,43 @@
+# stitch.example.yaml
+# Copy this file to stitch.yaml and fill in your own sections.
+# stitch.yaml is gitignored — it never leaves your machine.
+#
+# Each section maps one block in master.md to one block in template.tex.
+# The pipeline reads this file at runtime — no code changes needed.
+
+sections:
+  # ── Section 1: Your current/most recent role ────────────────────────────────
+  - key: current_role               # used as dict key throughout pipeline (no spaces)
+    master_label: "My Current Role" # substring that appears in the ### header in master.md
+    master_section: experience      # "experience" or "projects"
+    master_slug: role1              # short slug used in bullet IDs — keep it stable
+    budget: 2                       # how many bullets to select for this section
+    max_topics: 2                   # max number of topics to draw bullets from
+    min_score_pct: 0.65             # topic must score ≥ 65% of top topic to be included
+    template_anchor: '\projectheading{My Current Role Title}'  # exact string in template.tex
+
+  # ── Section 2: Main project ──────────────────────────────────────────────────
+  - key: main_project
+    master_label: "My Main Project"
+    master_section: projects
+    master_slug: proj1
+    budget: 3
+    max_topics: 2
+    min_score_pct: 0.65
+    template_anchor: '\projectheading{My Project Name}'
+    # Optional: if this section has a frozen techstack line in the template,
+    # set github_anchor to the exact \greylink line above the \techstack line.
+    github_anchor: '\greylink{https://github.com/your-username/your-project}{GitHub} \\'
+    frozen_techstack: 'FastAPI | PostgreSQL | React | Docker'
+
+  # ── Section 3: Education ─────────────────────────────────────────────────────
+  - key: education
+    master_label: "My University"
+    master_section: projects        # treat graduation project bullets as a "project"
+    master_slug: edu
+    budget: 1
+    max_topics: 1
+    min_score_pct: 1.0              # always pick the best topic regardless of score gap
+    template_anchor: '\projectheading{My University Name}'
+
+  # Add more sections as needed — the pipeline handles any number.

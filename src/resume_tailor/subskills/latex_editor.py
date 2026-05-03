@@ -11,17 +11,9 @@ edit(selection, company, output_dir) -> Path
 import re
 from pathlib import Path
 
+from resume_tailor import config as _cfg
+
 TEMPLATE = Path(__file__).parents[4] / "template" / "template.tex"
-
-# ---------------------------------------------------------------------------
-# USER CONFIG — update these to match your template.tex
-# ---------------------------------------------------------------------------
-# The exact \greylink line for your Mosaic/main-project GitHub link
-# (used as the anchor to find and replace the techstack line below it)
-MOSAIC_GITHUB_ANCHOR = r"\greylink{https://github.com/abdmaherag/mosaic}{GitHub} \\"
-
-# The exact \projectheading text for your university
-EDUCATION_ANCHOR = r"\projectheading{Al-Balqaa Applied University}"
 
 # ---------------------------------------------------------------------------
 # Text processing helpers
@@ -112,14 +104,14 @@ def _replace_itemize(tex: str, section_anchor: str, new_items: str) -> str:
     return before + "\n" + new_items + "\n" + after
 
 
-def _replace_techstack(tex: str, new_stack: str) -> str:
-    """Replace the \\techstack{...} line for the Mosaic project."""
-    # Anchor: the line immediately after the GitHub greylink for Mosaic.
-    # The techstack line is the next \techstack{...} occurrence after the GitHub link.
-    anchor = MOSAIC_GITHUB_ANCHOR
-    anchor_pos = tex.find(anchor)
+def _replace_techstack(tex: str, new_stack: str, github_anchor: str) -> str:
+    """Replace the \\techstack{...} line directly below `github_anchor` in the template."""
+    anchor_pos = tex.find(github_anchor)
     if anchor_pos == -1:
-        raise ValueError("Mosaic GitHub greylink anchor not found in template.")
+        raise ValueError(
+            f"GitHub greylink anchor not found in template: {github_anchor!r}\n"
+            "Check that github_anchor in stitch.yaml matches your template.tex exactly."
+        )
     ts_start = tex.find(r"\techstack{", anchor_pos)
     ts_end = tex.find("}", ts_start) + 1  # closing brace
     return tex[:ts_start] + f"\\techstack{{{new_stack}}}" + tex[ts_end:]
@@ -147,15 +139,10 @@ def _replace_skills(tex: str, ai_ml: str, concepts_tools: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-DEFAULT_MOSAIC_STACK = (
-    "FastAPI | ChromaDB | Sentence-Transformers | rank-bm25 | Groq (Llama 3.3 70B) | Next.js | Docker"
-)
-
-
 def edit(selection: dict, output_dir: Path) -> Path:
     """
     Fill the locked template with tailored content from `selection`.
-    The Mosaic techstack line is always written from DEFAULT_MOSAIC_STACK — untouched.
+    Sections and anchors are driven by stitch.yaml — no hardcoded values.
 
     Args:
         selection:   Output dict from resume_selector.select().
@@ -172,33 +159,24 @@ def edit(selection: dict, output_dir: Path) -> Path:
     # 1. Summary
     tex = _replace_summary(tex, selection["summary"])
 
-    # 2. AI Engineer bullets
-    tex = _replace_itemize(
-        tex,
-        r"\projectheading{AI Engineer}",
-        _make_items(selection["bullets"]["ai_engineer"]),
-    )
+    # 2. Sections — driven by stitch.yaml
+    for section in _cfg.get_sections():
+        key     = section["key"]
+        anchor  = section["template_anchor"]
+        bullets = selection["bullets"].get(key, [])
 
-    # 3. Mosaic techstack (always default — untouched by the pipeline) + bullets
-    tex = _replace_techstack(tex, DEFAULT_MOSAIC_STACK)
-    tex = _replace_itemize(
-        tex,
-        r"\projectheading{Mosaic RAG Pipeline}",
-        _make_items(selection["bullets"]["mosaic"]),
-    )
+        # Optional frozen techstack line (e.g. for a project section)
+        if "github_anchor" in section:
+            stack = section.get("frozen_techstack", "")
+            tex = _replace_techstack(tex, stack, section["github_anchor"])
 
-    # 4. Technical Skills
+        tex = _replace_itemize(tex, anchor, _make_items(bullets))
+
+    # 3. Technical Skills
     tex = _replace_skills(
         tex,
         selection["skills"]["ai_ml"],
         selection["skills"]["concepts_tools"],
-    )
-
-    # 5. Education bullet
-    tex = _replace_itemize(
-        tex,
-        EDUCATION_ANCHOR,
-        _make_items(selection["bullets"]["education"]),
     )
 
     output_dir.mkdir(parents=True, exist_ok=True)

@@ -28,11 +28,12 @@ from pathlib import Path
 
 from resume_tailor.client import get_client
 from resume_tailor.prompts.resume_selector import SYSTEM_PROMPT
+from resume_tailor import config as _cfg
 
 SCRATCH_FILE = Path(__file__).parents[3] / "scratch" / "02b-resume-selection.json"
 MODEL = "claude-sonnet-4-5"
 
-BULLET_BUDGETS  = {"ai_engineer": 2, "mosaic": 3, "education": 1}
+BULLET_BUDGETS  = _cfg.get_bullet_budgets()  # loaded from stitch.yaml
 REQUIRED_KEYS   = {"bullets", "skills", "summary",
                    "selection_log", "self_review", "flags"}
 REQUIRED_SKILLS = {"ai_ml", "concepts_tools"}

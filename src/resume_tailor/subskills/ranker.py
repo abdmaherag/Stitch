@@ -14,6 +14,7 @@ import re
 from pathlib import Path
 
 from resume_tailor.subskills.master_parser import TOPIC_SLUGS
+from resume_tailor import config as _cfg
 
 SCRATCH_FILE = Path(__file__).parents[3] / "scratch" / "02a-ranked-bullets.json"
 
@@ -26,28 +27,7 @@ WEIGHTS = {
     "mirror_verb":     10,  # bullet opens with a JD mirror_verb
 }
 
-# ── Section config ───────────────────────────────────────────────────────────
-# parsed_path: (top_key, project_slug) into the master_parser result dict
-SECTIONS = {
-    "ai_engineer": {
-        "parsed_path":    ("experience", "exp"),
-        "budget":          2,
-        "max_topics":      2,
-        "min_score_pct":   0.65,
-    },
-    "mosaic": {
-        "parsed_path":    ("projects", "mosaic"),
-        "budget":          3,
-        "max_topics":      2,
-        "min_score_pct":   0.65,
-    },
-    "education": {
-        "parsed_path":    ("projects", "weather"),
-        "budget":          1,
-        "max_topics":      1,
-        "min_score_pct":   1.0,
-    },
-}
+# Section config is loaded from stitch.yaml at runtime via config.get_ranker_sections()
 
 # Candidate pool sent to 2B = allocated_bullets + EXTRA_POOL (gives 2B real choices)
 EXTRA_POOL = 2
@@ -230,7 +210,7 @@ def rank(jd_analysis: dict, parsed_master: dict) -> dict:
     output: dict = {}
     debug: dict = {}  # full score breakdown for scratch file
 
-    for section_key, cfg in SECTIONS.items():
+    for section_key, cfg in _cfg.get_ranker_sections().items():
         top_key, proj_slug = cfg["parsed_path"]
         project_data: dict = parsed_master.get(top_key, {}).get(proj_slug, {})
 

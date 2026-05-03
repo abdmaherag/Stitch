@@ -28,6 +28,8 @@ import hashlib
 import re
 from pathlib import Path
 
+from resume_tailor import config as _cfg
+
 MASTER_MD = Path(__file__).parents[3] / "master.md"
 
 VOICE_LABELS = {
@@ -52,12 +54,6 @@ TOPIC_SLUGS: dict[str, str] = {
     "Research / Methodology":      "research",
 }
 
-# Substring to match in ### headers → (section_key, project_slug)
-PROJECT_MAP: list[tuple[str, str, str]] = [
-    ("AI Engineer",            "experience", "exp"),
-    ("Mosaic Project",         "projects",   "mosaic"),
-    ("Weather Forecast Project","projects",  "weather"),
-]
 
 
 def _extract_voice(text: str) -> tuple[str, str]:
@@ -79,6 +75,7 @@ def parse(path: Path | None = None) -> dict:
     md = (path or MASTER_MD).read_text(encoding="utf-8")
     lines = md.splitlines()
 
+    project_map = _cfg.get_project_map()
     result: dict = {"experience": {}, "projects": {}, "skills_raw": ""}
 
     cur_section: str | None  = None   # "experience" | "projects" | "skills"
@@ -111,7 +108,7 @@ def parse(path: Path | None = None) -> dict:
             cur_proj_section = None
             cur_proj_slug    = None
             cur_topic        = None
-            for match_str, sec, slug in PROJECT_MAP:
+            for match_str, sec, slug in project_map:
                 if match_str in header:
                     cur_proj_section = sec
                     cur_proj_slug    = slug
