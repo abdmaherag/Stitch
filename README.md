@@ -1,6 +1,6 @@
-# resume-tailor
+# Stitch
 
-A multi-agent Python pipeline that reads a job description and produces a tailored, ATS-optimized LaTeX resume — fully automated from paste to PDF-ready `.tex` file.
+A multi-agent pipeline that reads a job description and produces a tailored, ATS-optimized LaTeX resume — automatically selecting, scoring, and lightly editing bullets from your personal library to match each role.
 
 ## How it works
 
@@ -24,13 +24,15 @@ JD text ──────► jd_analyzer  (Claude Sonnet)   → scratch/01-jd-a
 
 **master.md** is your bullet library — 8 bullets × 4 voices per topic, covering every experience and project. The pipeline never invents content; it only selects and lightly edits from what you wrote.
 
+**stitch.yaml** is your personal config — it tells the pipeline which sections you have, how many bullets each gets, and where they live in your LaTeX template. No code changes needed to adapt this to your own background.
+
 ## Setup
 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/resume-tailor.git
-cd resume-tailor
+git clone https://github.com/abdmaherag/Stitch.git
+cd Stitch
 pip install -e .
 ```
 
@@ -43,30 +45,50 @@ cp master.example.md master.md
 
 ```bash
 cp template/template.example.tex template/template.tex
-# Edit template/template.tex — fill in your name, contact info, frozen sections
+# Edit template/template.tex — fill in your name, contact info, and section layout
 ```
 
-Both files are gitignored. They never leave your machine.
+### 3. Configure your sections
 
-### 3. Update anchors in latex_editor.py
-
-Open `src/resume_tailor/subskills/latex_editor.py` and update the two constants at the top of the **USER CONFIG** section to match the exact text in your `template.tex`:
-
-```python
-MOSAIC_GITHUB_ANCHOR = r"\greylink{https://github.com/your-username/your-project}{GitHub} \\"
-EDUCATION_ANCHOR     = r"\projectheading{Your University}"
+```bash
+cp stitch.example.yaml stitch.yaml
+# Edit stitch.yaml — define your sections, bullet budgets, and template anchors
 ```
 
-These are used as string anchors to locate the regions to replace — they must match your template verbatim.
+Each entry in `stitch.yaml` maps one block in `master.md` to one block in `template.tex`:
+
+```yaml
+sections:
+  - key: current_role
+    master_label: "My Current Role"   # substring of the ### header in master.md
+    master_section: experience
+    master_slug: role1
+    budget: 2                         # bullets to select for this section
+    max_topics: 2
+    min_score_pct: 0.65
+    template_anchor: '\projectheading{My Current Role Title}'  # exact string in template.tex
+
+  - key: main_project
+    master_label: "My Main Project"
+    master_section: projects
+    master_slug: proj1
+    budget: 3
+    max_topics: 2
+    min_score_pct: 0.65
+    template_anchor: '\projectheading{My Project Name}'
+    github_anchor: '\greylink{https://github.com/your-username/your-project}{GitHub} \\'
+    frozen_techstack: 'FastAPI | PostgreSQL | React | Docker'
+```
+
+All three files (`master.md`, `template.tex`, `stitch.yaml`) are gitignored — they never leave your machine.
 
 ### 4. Set your API key
 
 ```bash
-# Create resume-tailor/.env
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
 ```
 
-Requires an [Anthropic API key](https://console.anthropic.com/) with credits. The pipeline calls Claude Sonnet twice per run (steps 1 and 2B).
+Requires an [Anthropic API key](https://console.anthropic.com/) with credits. The pipeline makes two Claude calls per run (JD analysis and bullet selection).
 
 ### 5. Run
 
@@ -88,19 +110,13 @@ Paste company name, role, JD link, then the full job description. Type `END` on 
 | `has_metric` | 15 | Bullet contains a concrete number |
 | `mirror_verb` | 10 | Opening verb matches a JD mirror verb |
 
-## Bullet budget (default)
+## Bullet budget
 
-| Section | Bullets |
-|---|---|
-| AI Engineer (current role) | 2 |
-| Mosaic project | 3 |
-| Education | 1 |
-
-Change in `ranker.py → SECTIONS`.
+Defined per section in `stitch.yaml`. Add as many sections as your resume has — the pipeline handles any number.
 
 ## State persistence
 
-Each LLM step writes a scratch file. On the next run you are offered the option to skip already-completed steps — useful when a step fails mid-pipeline. Step 1's cache is hash-verified against the current JD; loading yesterday's analysis for today's job is blocked automatically.
+Each LLM step writes a scratch file. On the next run you are offered the option to skip already-completed steps — useful when a step fails mid-pipeline. Step 1's cache is hash-verified against the current JD; loading a cached analysis for a different job is blocked automatically.
 
 ## Project structure
 
@@ -108,6 +124,7 @@ Each LLM step writes a scratch file. On the next run you are offered the option 
 src/resume_tailor/
   main.py               # REPL orchestrator
   client.py             # Anthropic client singleton
+  config.py             # Loads stitch.yaml and serves it to the pipeline
   prompts/              # System prompts (jd_analyzer, resume_selector)
   subskills/
     master_parser.py    # Parses master.md → structured dict at runtime
@@ -117,23 +134,22 @@ src/resume_tailor/
     latex_editor.py     # Step 3 — pure Python template filler
     tracker_manager.py  # Step 4 — CSV appender
 tools/
-  bullet_generator.py   # Authoring tool — generates master.md bullets from paragraphs
+  bullet_generator.py   # Authoring tool — generates master.md bullets from raw paragraphs
 template/
-  template.example.tex  # Public placeholder template (fill in and rename)
-master.example.md       # Public placeholder bullet library (fill in and rename)
+  template.example.tex  # Placeholder LaTeX template (copy, rename, fill in)
+master.example.md       # Placeholder bullet library (copy, rename, fill in)
+stitch.example.yaml     # Placeholder section config (copy, rename, fill in)
 ```
 
-## Known limitations / TODO
+## Known limitations
 
-- **B3 — validator retry loop**: on a bad 2B response the pipeline retries once. If the retry also fails, it raises and the scratch is not written — you have to re-run from 2B manually.
-- **B4 — SCADA / second-role block**: the LaTeX editor has a frozen SCADA block for a second role. If your second role is different, you need to edit `latex_editor.py → _FROZEN_SCADA` and the corresponding template block.
-- Model name `claude-sonnet-4-5` — verify this matches your account's available models on the [Anthropic console](https://console.anthropic.com/). If not, update `MODEL` in `subskills/jd_analyzer.py` and `subskills/resume_selector.py`.
+- **Validator retry**: on a failed 2B response the pipeline retries once with the exact errors fed back to Claude. If the retry also fails, it raises — re-run from 2B using the scratch file cache.
+- **Model name**: `claude-sonnet-4-5` — verify this matches your account's available models on the [Anthropic console](https://console.anthropic.com/). If not, update `MODEL` in `subskills/jd_analyzer.py` and `subskills/resume_selector.py`.
 
 ## Requirements
 
 - Python 3.11+
-- `anthropic` SDK
-- `python-dotenv`
+- `anthropic`, `python-dotenv`, `pyyaml`
 - A LaTeX installation (e.g. TeX Live, MiKTeX) to compile the output `.tex` to PDF
 
 ## License
