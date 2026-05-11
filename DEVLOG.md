@@ -1,61 +1,74 @@
 # resume-test Dev Log
 
 ## Working State
-**Session:** 2 | **Date:** 2026-05-11
+**Session:** 3 | **Date:** 2026-05-11 | **Branch:** OPTIONC
 
 ### Active Task
-Pipeline fully wired and template-aligned. master.md populated with real career content. Edge case for underfilled slots added. Ready for first end-to-end real-JD run.
+Standalone Python port shipped on `OPTIONC` branch. Project is now runnable two ways: via Claude Code skill (main branch design) OR via direct Anthropic SDK (`python -m resume_test`). All prompts, configs, and renderer shared between the two modes — only the orchestration layer differs.
 
-- [x] Install deps (docxtpl, docx2pdf, pywin32 — all import OK)
-- [x] Run setup.py — scaffolds generated
-- [x] Surgically fix user's real `templt.docx` → `template.docx`: unique slot ids per role/project, 3-paragraph for/content/endfor blocks, skills casing
-- [x] Smoke-test docxtpl render with sample data — produces correct paragraph count per slot
-- [x] Update template-config.yaml with real ids (ai_engineer / scada_engineer / resume_agent / rag) + counts (5/4/5/5)
-- [x] Rewrite master.md: H2 headings tagged `[<slot_id>]`, real dates/companies, Mosaic→rag, Stitch→resume_agent, skeleton boilerplate stripped
-- [x] Update writer + reviewer prompts with binding slot-mapping rule (find `[<id>]` heading or hard-fail)
-- [x] Add underfill edge case: `bullet_count` is now an UPPER BOUND, writer can stop early to avoid padding
-- [ ] First end-to-end run with a real JD <-- NEXT
-- [ ] Decide on visual bullet styling in template.docx (`{{b}}` paragraph currently "Normal" — bullets won't render with bullet markers)
+- [x] git init + commit baseline on main (Claude Code skill version, sans personal data)
+- [x] Create OPTIONC branch
+- [x] Build `src/resume_test/` package: pipeline, stages, anthropic_client, slugify, cli, __main__
+- [x] Add pyproject.toml with `resume-test` console script entry point
+- [x] Add `anthropic>=0.40.0` to requirements.txt
+- [x] pytest suite (33 tests, all passing): slugify normalization, JSON-extraction lenient parsing + retry, fill_and_render slot validation, has_critical_issues branching
+- [x] Eval scripts: `eval/atom_grounding.py` (verbatim atom check vs master.md, target ≥95%), `eval/jd_coverage.py` (required-skill substring check, target ≥80%)
+- [x] Sample JD fixture for eval reproducibility
+- [x] README.md with mermaid architecture diagram, install, dual-mode docs, eval usage, project layout, stack rationale
+- [x] LICENSE (MIT)
+- [x] gitignore personal data (master.md, template.docx, templt.docx, ~$*.docx) so portfolio repo never leaks contact info
+- [ ] First end-to-end run with real JD via standalone CLI <-- NEXT
+- [ ] Decide: merge OPTIONC → main, or keep as a parallel branch
 
 ### Key Files (current shape)
-**`master.md`** (POPULATED, ~7KB)
-Real content for 4 sections, all H2 headings tagged `[ai_engineer]`, `[scada_engineer]`, `[rag]`, `[resume_agent]`. Skills inventory in 3 categories with dense tags. Single source of truth for every bullet the writer can produce.
+**`src/resume_test/pipeline.py`** (NEW, ~140 lines)
+6-stage orchestrator. Standalone equivalent of SKILL.md. Slugify → save JD raw → analyzer (Sonnet) → writer pass 1 (Opus) → reviewer pass 1 (Sonnet) → conditional revision (writer pass 2 + reviewer pass 2 informational, only if any critical issue) → CLI approval gate → subprocess to fill_and_render.py.
 
-**`template.docx`** (FIXED, 2.4MB)
-User's polished resume with corrected docxtpl slots: 4 unique for/content/endfor blocks (one per role/project), skills placeholders cased correctly. `templt.docx` (typo source) kept as backup.
+**`src/resume_test/anthropic_client.py`** (NEW, ~95 lines)
+SDK wrapper. `Stage` dataclass (model + system_prompt + max_tokens). `call()` does the API call with `cache_control: ephemeral` on the system prompt for ~90% input-cost reduction on cache hits. `call_json()` parses, strips code fences, retries once with explicit reminder on parse failure, raises RuntimeError after second failure.
 
-**`template-config.yaml`** (UPDATED)
-4 slots: ai_engineer (5), scada_engineer (4), resume_agent (5), rag (5). Counts are now interpreted as upper bounds, not strict equality.
+**`src/resume_test/stages.py`** (NEW, ~115 lines)
+Per-stage helpers: `run_analyzer`, `run_writer` (handles both first pass and revision pass with optional `previous_bullets` + `review` args), `run_reviewer`. Each loads prompt from `.claude/skills/resume-test/prompts/`, builds user message with XML-tagged context blocks, writes JSON output to `.tmp/<slug>/`. Plus `has_critical_issues()` for the revision-loop decision.
 
-**`.claude/skills/resume-test/prompts/{writer,reviewer}.md`** (REVISED)
-Writer: binding slot-mapping rule (search master.md for `[<id>]` heading), upper-bound count semantics with `underfilled` flag in output schema, hard early-stop triggers on padding/filler/repetition. Reviewer: count_violation only fires on over-cap or zero, underfill is a minor advisory.
+**`src/resume_test/slugify.py`** (NEW, ~30 lines)
+Pure helper: company name → filesystem-safe slug. Unicode normalization → ASCII → lowercase → collapse non-alphanumeric to single hyphens → strip. 12 parametrized tests cover Unicode, punctuation, edge cases.
 
-**`scripts/setup.py`** (PATCHED)
-`add_bullet_loop()` helper now emits 3 separate paragraphs (for / `{{b}}` / endfor). Future `--setup` runs won't reproduce the single-line bug.
+**`pyproject.toml`** (NEW)
+Setuptools config. `resume-test` console script entry point. `[dev]` extra has pytest + pytest-mock. `pythonpath = ["src"]` so tests resolve the package without install.
+
+**`eval/atom_grounding.py`** (NEW, ~120 lines)
+Extracts numbers + tech tokens (CamelCase, ALL_CAPS, hyphenated) from each bullet via two regexes, checks each appears verbatim in master.md (case-insensitive substring). Score = grounded / total. Stop-list filters out the verb whitelist so "Built" doesn't get flagged as a tech atom.
 
 ### Decisions (active)
-- **`[slot_id]` tags in H2 headings** — explicit binding from master.md sections to YAML slots. Writer hard-fails if a slot id has no matching `[<id>]` heading (no guessing from titles).
-- **Bullet count is an UPPER BOUND** — writer produces 1..N, stops early to prevent hallucinated padding. Underfill surfaces as `<actual>/<bullet_count>` at the approval gate.
-- **Mosaic = rag, Stitch = resume_agent** — slot id naming chosen for genericity (rag/resume_agent describe the type of artifact, not the project's branded name).
+- **Dual-mode by design:** prompts + configs + renderer shared between Claude Code skill (.claude/skills/resume-test/) and standalone Python (src/resume_test/). Only the orchestrator differs. Anyone can run either path; same outputs.
+- **Personal data gitignored from day one:** master.md, template.docx, templt.docx never enter git history. Setup script generates skeletons; users customize locally.
+- **Prompt caching on system messages:** the analyzer/writer/reviewer prompts are large and reused — `cache_control: ephemeral` on each system message means subsequent calls within 5 minutes hit cache.
+- **JSON retry, not validate-and-fail:** if the model wraps output in code fences or emits invalid JSON, we strip fences and retry once with an explicit reminder. Two failures → RuntimeError with the raw output for debugging.
+- **Eval scripts ship as artifacts, not gates:** `eval/atom_grounding.py` and `eval/jd_coverage.py` are runnable but not wired into the pipeline. They document what "good output" means objectively, give recruiters reading the repo something concrete to point to, and let me run regression checks when changing prompts.
 
 ### Next Steps
-1. Open Claude Code in this project, run `/resume-test`, paste a real JD.
-2. Check `.tmp/<slug>/jd-analysis.json` after Stage 1 — verify standard ATS schema is populated correctly.
-3. Check `.tmp/<slug>/bullets-v1.json` after Stage 2 — verify writer found `[<id>]` headings and produced sourced bullets.
-4. Eyeball the rendered PDF — confirm visual bullets are how you want them. If they look like flat indented text instead of bulleted lines, change the `{{b}}` paragraph's style to "List Bullet" in Word.
+1. Run end-to-end via standalone CLI: `export ANTHROPIC_API_KEY=...` then `python -m resume_test --company "Acme" --jd ./test-jd.txt`. Verify the full 6 stages execute against the real Anthropic API.
+2. Run the eval scripts on the resulting bullets-v1.json — confirm atom-grounding ≥95% and JD coverage ≥80% on a real run.
+3. If both work, decide whether to merge OPTIONC → main or keep as a parallel "standalone" branch with main being "Claude Code only."
+4. Push to GitHub. Pin Mosaic + AI Engineer + resume-test as the three portfolio entries.
 
 ### Blockers
 None.
 
 ### Watch Out
-- `{{b}}` content paragraph in `template.docx` is styled "Normal" (inherited from `templt.docx`). Generated bullets will render as flat text, not visually bulleted. Fix in Word if needed.
-- docx2pdf opens Word in the foreground — close any open `template.docx` in Word before running the pipeline or save will fail.
-- Stale lock file `~$mplate.docx` may persist if Word crashed; safe to delete manually if it blocks renders.
+- Standalone mode requires `ANTHROPIC_API_KEY` env var. Costs ~$0.06–0.15 per pipeline run depending on revision-pass triggering (Sonnet ~$0.012/call, Opus ~$0.045/call, prompt cache helps).
+- Subprocess call to `fill_and_render.py` from `pipeline.py` uses `sys.executable` — should work in venvs. Check stderr if rendering fails.
+- pyproject.toml uses src-layout; `pip install -e .` is required for `resume-test` console script to work, OR set PYTHONPATH=src for direct invocation.
 
 ---
 ---
 
 ## Session Archive
+
+### Session 3 — 2026-05-11: OPTIONC standalone port (portfolio-ize)
+**What we did:** git init. Committed Claude Code skill as baseline on main. Created OPTIONC branch. Ported the orchestrator off Claude Code: built `src/resume_test/` (pipeline, stages, anthropic_client, slugify, cli, __main__) using the Anthropic SDK directly, with prompt caching + JSON-extraction + one-shot retry. Added pyproject.toml + console script entry. Wrote 33 pytests (all passing). Built two eval scripts (atom_grounding, jd_coverage) + sample JD fixture. Wrote README with mermaid architecture diagram + install + dual-mode docs. Added MIT license. Gitignored personal data.
+**Files:** src/resume_test/{__init__,pipeline,stages,anthropic_client,slugify,cli,__main__}.py, tests/{test_slugify,test_anthropic_client,test_fill_and_render,test_stages}.py, eval/{atom_grounding,jd_coverage,fixtures/sample-jd-ai-engineer.txt}, pyproject.toml, requirements.txt, README.md, LICENSE, .gitignore (updated).
+**Decisions:** Dual-mode (Claude Code AND standalone) over migrating fully off Claude Code. Personal data gitignored from initial commit so portfolio repo never leaks contact info. Prompt caching on every system message. JSON retry over validate-and-fail.
 
 ### Session 2 — 2026-05-11: Real-content wiring + edge cases
 **What we did:** Installed deps. Ran setup. Fixed user's real `templt.docx` (4 problems: shared slot ids, repeated for-loop paragraphs, skills casing, filename) — required two passes after discovering docxtpl needs separate paragraphs for for/content/endfor. Patched setup.py to never reproduce the single-line bug. Rewrote master.md with `[slot_id]` tagged headings + real career content. Updated writer/reviewer prompts to enforce the tag binding. Added upper-bound bullet count semantics with `underfilled` flag.
@@ -74,7 +87,11 @@ None.
 - [x] Skeleton scaffold complete
 - [x] Real template + master.md wired in (slot ids match end-to-end)
 - [x] Underfill edge case implemented
-- [ ] First end-to-end successful run
+- [x] Standalone Python port shipped (OPTIONC branch)
+- [x] Test suite (33 tests, all passing)
+- [x] Eval scripts (atom_grounding + jd_coverage)
+- [x] README + LICENSE + portfolio-ready packaging
+- [ ] First end-to-end successful run via standalone CLI
 - [ ] Pipeline used for a real job application
 - [ ] Cover letter generation added (out of v1 scope)
 
@@ -93,3 +110,4 @@ None.
 - Multi-language support (currently English only).
 - Optional: cache `.tmp/jd-analysis.json` keyed by JD hash so repeat runs of the same JD skip the analyzer.
 - If breaking master.md sections into multi-paragraph sub-blocks (per-theme) becomes useful, the writer's source-scan would still work since it's section-bounded by H2.
+- 60-second screencap of standalone CLI for the README.

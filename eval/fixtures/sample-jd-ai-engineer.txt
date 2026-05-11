@@ -1,0 +1,28 @@
+Senior AI Engineer — RAG & Agent Systems
+
+We're hiring a Senior AI Engineer to design and ship production-grade
+retrieval-augmented systems for our enterprise document corpus. You'll own
+the full stack: ingestion pipelines, semantic chunking, hybrid retrieval
+(vector + BM25), evaluation harnesses, and the LLM serving layer.
+
+Required:
+- 4+ years building Python services in production
+- Hands-on experience with RAG architectures: chunking, embeddings,
+  vector stores, retrieval ranking
+- Production experience with FastAPI or similar async web frameworks
+- Deep familiarity with at least one vector DB (ChromaDB, Pinecone, Weaviate)
+- Experience with semantic search using sentence-transformers or
+  similar embedding models
+- Comfort writing eval harnesses with concrete metrics (hit@k, etc.)
+
+Preferred:
+- Hybrid retrieval with BM25 fusion (Reciprocal Rank Fusion)
+- Hallucination mitigation patterns (no-answer prompts, distance gates)
+- Streaming generation via Server-Sent Events
+- Docker + cloud deployment (HuggingFace Spaces, Modal, etc.)
+- Test discipline (pytest, mocked encoders, ablation studies)
+
+You'll work directly with the founding engineering team. Strong candidates
+ship robust, well-tested systems and care about evaluation as much as
+features. Bonus if you've built tooling for distributed teams or
+multi-tenant data isolation.
