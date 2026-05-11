@@ -1,0 +1,22 @@
+# Slot definitions for template.docx.
+# Each id must match a Jinja slot in template.docx (e.g. id "ai_engineer"
+# corresponds to the slot {%p for b in ai_engineer_bullets %}{{b}}{%p endfor %}).
+
+roles:
+  - id: ai_engineer
+    bullet_count: 3
+  - id: scada_engineer
+    bullet_count: 2
+
+projects:
+  - id: resume_agent
+    bullet_count: 4
+  - id: rag
+    bullet_count: 3
+
+skills:
+  categories:
+    - Languages
+    - AI&ML
+    - Concepts & Tools
+  max_per_category: 8

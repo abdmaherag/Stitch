@@ -1,0 +1,21 @@
+.tmp/
+out/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.local
+
+# Personal data — never commit these. Users generate via /resume-test --setup
+# and then customize with their own resume content.
+master.md
+template.docx
+templt.docx
+~$*.docx
+
+# Pytest / build
+.pytest_cache/
+*.egg-info/
+build/
+dist/
