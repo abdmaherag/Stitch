@@ -18,8 +18,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from anthropic import Anthropic
-
+from .anthropic_client import make_client
 from .slugify import slugify
 from .stages import (
     PROJECT_ROOT,
@@ -48,7 +47,7 @@ def run_pipeline(
     (tmp_dir / "jd-raw.txt").write_text(jd_text, encoding="utf-8")
     print(f"[Stage 0] slug={slug!r}  tmp={tmp_dir.relative_to(PROJECT_ROOT)}")
 
-    client = Anthropic()  # picks up ANTHROPIC_API_KEY from env
+    client = make_client()  # OAuth (preferred) or API key, see anthropic_client.make_client
 
     print("[Stage 1] Analyzer (Sonnet)...")
     analysis = run_analyzer(client, tmp_dir)

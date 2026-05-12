@@ -67,12 +67,21 @@ Both modes share the same prompts (`prompts/analyzer.md`, `prompts/writer.md`, `
 Requires Python 3.11+ and Microsoft Word (for PDF rendering on Windows via docx2pdf).
 
 ```bash
-pip install -e .                  # installs the package + deps
-export ANTHROPIC_API_KEY=sk-...   # for standalone mode
+pip install -e .              # installs the package + deps
 
-python scripts/setup.py           # generates skeletons of master.md,
-                                  # template.docx, template-config.yaml
+# Auth — pick ONE of:
+claude setup-token            # generate a long-lived OAuth token, then:
+export ANTHROPIC_AUTH_TOKEN=sk-ant-oat-...   # bills against Claude Code subscription
+# -- or --
+export ANTHROPIC_API_KEY=sk-ant-api-...      # direct API billing
+
+python scripts/setup.py       # generates skeletons of master.md,
+                              # template.docx, template-config.yaml
 ```
+
+**OAuth is recommended.** `claude setup-token` generates a long-lived token tied to your Claude Code subscription — runs cost nothing extra beyond what you already pay for Claude Code. The API key path bills metered tokens (~$0.06–0.15/run) directly to your Anthropic account.
+
+If you're invoking via the Claude Code skill (`/resume-test`) instead of the standalone CLI, neither env var is needed — parent Claude's session auth is used automatically.
 
 Then customize:
 1. **`master.md`** — your full career narrative as H2 sections tagged `[<slot_id>]`. Every claim the writer can use must live here. See [scripts/setup.py](scripts/setup.py) for the skeleton.
