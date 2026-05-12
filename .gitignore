@@ -7,12 +7,13 @@ venv/
 .env
 .env.local
 
-# Personal data — never commit these. Users generate via /stitch --setup
-# and then customize with their own resume content.
+# Personal data — never commit. Templated by *.example.* files.
+# Users copy <name>.example.<ext> -> <name>.<ext> and customize.
 master.md
 template.docx
 templt.docx
 ~$*.docx
+template-config.yaml
 
 # Pytest / build
 .pytest_cache/

@@ -13,7 +13,7 @@ def slugify(name: str) -> str:
     different companies' artifacts never collide on the filesystem.
 
     Examples:
-        "Al Atheer Group"  -> "al-atheer-group"
+        "Acme Industries"  -> "acme-industries"
         "Goldman Sachs"    -> "goldman-sachs"
         "  ACME!  "        -> "acme"
         "Müller & Co."     -> "muller-co"

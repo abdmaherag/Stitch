@@ -10,7 +10,7 @@ from stitch.slugify import slugify
 @pytest.mark.parametrize("name, expected", [
     ("Acme", "acme"),
     ("Acme Corp", "acme-corp"),
-    ("Al Atheer Group", "al-atheer-group"),
+    ("Acme Industries", "acme-industries"),
     ("Goldman Sachs", "goldman-sachs"),
     ("OpenAI", "openai"),
     ("  acme  ", "acme"),

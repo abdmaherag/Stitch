@@ -1,0 +1,34 @@
+# Slot definitions for template.docx (EXAMPLE).
+#
+# Copy this file to template-config.yaml (gitignored) and customize for
+# your own resume:
+#
+#   cp template-config.example.yaml template-config.yaml
+#
+# Each id must match THREE things:
+#   1. The {%p for b in <id>_bullets %} loop in template.docx
+#   2. The [<id>] tag in master.md H2 headings
+#   3. This file
+#
+# bullet_count is the number of bullets the writer should produce per slot.
+# Pick counts that fit the visual space in your template.docx. Older roles
+# usually get fewer bullets than current roles.
+
+roles:
+  - id: senior_engineer
+    bullet_count: 4
+  - id: previous_role
+    bullet_count: 3
+
+projects:
+  - id: main_project
+    bullet_count: 4
+  - id: side_project
+    bullet_count: 3
+
+skills:
+  categories:
+    - Languages
+    - AI&ML
+    - Concepts & Tools
+  max_per_category: 8

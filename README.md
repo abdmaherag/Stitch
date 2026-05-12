@@ -74,19 +74,27 @@ claude setup-token            # generate a long-lived OAuth token, then:
 export ANTHROPIC_AUTH_TOKEN=sk-ant-oat-...   # bills against Claude Code subscription
 # -- or --
 export ANTHROPIC_API_KEY=sk-ant-api-...      # direct API billing
-
-python scripts/setup.py       # generates skeletons of master.md,
-                              # template.docx, template-config.yaml
 ```
 
-**OAuth is recommended.** `claude setup-token` generates a long-lived token tied to your Claude Code subscription — runs cost nothing extra beyond what you already pay for Claude Code. The API key path bills metered tokens (~$0.06–0.15/run) directly to your Anthropic account.
+**OAuth is recommended.** `claude setup-token` generates a long-lived token tied to your Claude Code subscription — runs cost nothing extra beyond what you already pay for Claude Code. The API key path bills metered tokens (~$0.06–0.15/run) directly to your Anthropic account. If you're invoking via the Claude Code skill (`/stitch`) instead of the standalone CLI, neither env var is needed — parent Claude's session auth is used automatically.
 
-If you're invoking via the Claude Code skill (`/stitch`) instead of the standalone CLI, neither env var is needed — parent Claude's session auth is used automatically.
+### Personal data: copy from `*.example.*` templates
 
-Then customize:
-1. **`master.md`** — your full career narrative as H2 sections tagged `[<slot_id>]`. Every claim the writer can use must live here. See [scripts/setup.py](scripts/setup.py) for the skeleton.
-2. **`template.docx`** — your polished resume with docxtpl Jinja slots. Each bullet list needs three paragraphs: `{%p for b in <id>_bullets %}` / `{{b}}` (List Bullet style) / `{%p endfor %}`.
+The repo ships skeleton/example versions of every personal-data file. Copy them once, then edit your real ones (which are gitignored — never committed):
+
+```bash
+cp master.example.md          master.md
+cp template-config.example.yaml  template-config.yaml
+python scripts/setup.py       # generates a placeholder template.docx
+                              # (refuses to overwrite if one already exists)
+```
+
+Then customize each:
+1. **`master.md`** — your full career narrative as H2 sections tagged `[<slot_id>]`. Every claim the writer can use must live here. See `master.example.md` for the structure.
+2. **`template.docx`** — your polished resume with docxtpl Jinja slots. Each bullet list needs three paragraphs: `{%p for b in <id>_bullets %}` / `{{b}}` (List Bullet style) / `{%p endfor %}`. The setup script generates a minimal placeholder you can replace with your real .docx (keeping the slot syntax).
 3. **`template-config.yaml`** — declares slot IDs and per-slot bullet counts. IDs must match both `[<id>]` tags in master.md AND `<id>_bullets` loops in template.docx.
+
+`.gitignore` keeps `master.md`, `template.docx`, `templt.docx`, `template-config.yaml`, `.tmp/`, and `out/` out of version control so your personal data stays local.
 
 ## Tests
 
