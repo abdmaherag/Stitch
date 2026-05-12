@@ -1,4 +1,4 @@
-"""Enables `python -m resume_test`."""
+"""Enables `python -m stitch`."""
 
 from .cli import main
 

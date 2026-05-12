@@ -1,7 +1,12 @@
-# resume-test Dev Log
+# stitch Dev Log
+
+> Originally built as "resume-test" through Sessions 1-3. Renamed to "stitch"
+> in Session 4 (folder, package, skill, slash command, docs all renamed end-to-end).
+> Older archive entries below reference the old names (`resume_test` package,
+> `/resume-test` skill, `.claude/skills/resume-test/`) as factual history.
 
 ## Working State
-**Session:** 3 | **Date:** 2026-05-11 | **Branch:** OPTIONC
+**Session:** 4 | **Date:** 2026-05-12 | **Branch:** main
 
 ### Active Task
 Standalone Python port shipped on `OPTIONC` branch. Project is now runnable two ways: via Claude Code skill (main branch design) OR via direct Anthropic SDK (`python -m resume_test`). All prompts, configs, and renderer shared between the two modes — only the orchestration layer differs.

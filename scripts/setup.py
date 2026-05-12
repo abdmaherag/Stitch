@@ -180,7 +180,7 @@ def main() -> None:
         "         {{skills_languages}} / {{skills_aiml}} / {{skills_concepts_tools}}\n"
         "  2. Edit template-config.yaml so each id matches a slot in your .docx.\n"
         "  3. Fill master.md with your full career narrative + skills inventory.\n"
-        "  4. Run /resume-test and paste a JD to test the pipeline.\n"
+        "  4. Run /stitch and paste a JD to test the pipeline.\n"
     )
 
 

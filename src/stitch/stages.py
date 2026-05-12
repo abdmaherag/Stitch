@@ -23,7 +23,7 @@ from .anthropic_client import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-PROMPTS_DIR = PROJECT_ROOT / ".claude" / "skills" / "resume-test" / "prompts"
+PROMPTS_DIR = PROJECT_ROOT / ".claude" / "skills" / "stitch" / "prompts"
 MASTER_MD = PROJECT_ROOT / "master.md"
 TEMPLATE_CONFIG = PROJECT_ROOT / "template-config.yaml"
 

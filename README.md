@@ -1,4 +1,4 @@
-# resume-test
+# stitch
 
 A source-grounded, three-agent resume tailoring pipeline. Takes a pasted job description, produces a `.docx` + `.pdf` resume tailored from a personal `master.md` — with a reviewer agent that catches fabricated metrics and missing JD keywords before render.
 
@@ -49,17 +49,17 @@ A 13-phrase banned-start blocklist (`Worked on`, `Responsible for`, `Helped with
 **Standalone Python (works without Claude Code):**
 
 ```bash
-python -m resume_test --company "Acme Corp" --jd ./jd.txt
+python -m stitch --company "Acme Corp" --jd ./jd.txt
 ```
 
 **Claude Code skill (in this project's directory):**
 
 ```
-/resume-test
+/stitch
 ```
 
 Both modes share the same prompts (`prompts/analyzer.md`, `prompts/writer.md`, `prompts/reviewer.md`), the same `template-config.yaml`, the same `master.md`, and the same renderer (`scripts/fill_and_render.py`). Only the orchestration layer differs:
-- Standalone: `src/resume_test/pipeline.py` calls the Anthropic SDK directly.
+- Standalone: `src/stitch/pipeline.py` calls the Anthropic SDK directly.
 - Claude Code: `SKILL.md` instructs parent Claude to spawn Task subagents.
 
 ## Install
@@ -81,7 +81,7 @@ python scripts/setup.py       # generates skeletons of master.md,
 
 **OAuth is recommended.** `claude setup-token` generates a long-lived token tied to your Claude Code subscription — runs cost nothing extra beyond what you already pay for Claude Code. The API key path bills metered tokens (~$0.06–0.15/run) directly to your Anthropic account.
 
-If you're invoking via the Claude Code skill (`/resume-test`) instead of the standalone CLI, neither env var is needed — parent Claude's session auth is used automatically.
+If you're invoking via the Claude Code skill (`/stitch`) instead of the standalone CLI, neither env var is needed — parent Claude's session auth is used automatically.
 
 Then customize:
 1. **`master.md`** — your full career narrative as H2 sections tagged `[<slot_id>]`. Every claim the writer can use must live here. See [scripts/setup.py](scripts/setup.py) for the skeleton.
@@ -114,14 +114,14 @@ Sample fixture in [eval/fixtures/sample-jd-ai-engineer.txt](eval/fixtures/sample
 ## Project layout
 
 ```
-src/resume_test/
+src/stitch/
   pipeline.py            6-stage orchestrator (standalone equivalent of SKILL.md)
   stages.py              analyzer / writer / reviewer stage helpers
   anthropic_client.py    SDK wrapper (prompt caching, JSON-extraction, retry)
   slugify.py             company name → filesystem-safe slug
-  cli.py                 argparse entry: `python -m resume_test`
+  cli.py                 argparse entry: `python -m stitch`
 .claude/                 Claude Code skill (alternative orchestrator)
-  skills/resume-test/
+  skills/stitch/
     SKILL.md             stage-by-stage instructions for parent Claude
     prompts/
       analyzer.md        Sonnet — extracts ATS schema from JD

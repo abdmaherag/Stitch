@@ -61,9 +61,9 @@ def main() -> None:
     out_dir = Path(args.out)
 
     if not TEMPLATE_DOCX.exists():
-        sys.exit(f"ERROR: template not found at {TEMPLATE_DOCX}. Run /resume-test --setup.")
+        sys.exit(f"ERROR: template not found at {TEMPLATE_DOCX}. Run /stitch --setup.")
     if not TEMPLATE_CONFIG.exists():
-        sys.exit(f"ERROR: config not found at {TEMPLATE_CONFIG}. Run /resume-test --setup.")
+        sys.exit(f"ERROR: config not found at {TEMPLATE_CONFIG}. Run /stitch --setup.")
     if not bullets_path.exists():
         sys.exit(f"ERROR: bullets file not found at {bullets_path}")
 

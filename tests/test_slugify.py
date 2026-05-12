@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from resume_test.slugify import slugify
+from stitch.slugify import slugify
 
 
 @pytest.mark.parametrize("name, expected", [

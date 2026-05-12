@@ -3,7 +3,7 @@ description: Tailor resume to a job description via 3-agent pipeline (analyzer /
 argument-hint: [--setup | --rerender <output-folder>]
 ---
 
-Invoke the `resume-test` skill. Arguments: $ARGUMENTS
+Invoke the `stitch` skill. Arguments: $ARGUMENTS
 
 Modes:
 - (no args)              — run the full pipeline (analyzer → writer → reviewer → render)

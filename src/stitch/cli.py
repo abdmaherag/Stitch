@@ -1,4 +1,4 @@
-"""CLI entry point: `python -m resume_test ...`"""
+"""CLI entry point: `python -m stitch ...`"""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from .pipeline import run_pipeline
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="resume-test",
+        prog="stitch",
         description="Tailor a resume to a job description via 3-agent pipeline.",
     )
     parser.add_argument(

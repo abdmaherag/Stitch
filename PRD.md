@@ -1,4 +1,4 @@
-# PRD — resume-test
+# PRD — stitch
 
 ## Problem
 
@@ -6,7 +6,7 @@ Tailoring a resume for each job application is time-consuming and error-prone. G
 
 ## Goal
 
-A Claude Code skill that, on `/resume-test`, takes a pasted JD and produces a tailored .docx + PDF in under ~2 minutes, with bullets sourced strictly from a personal `master.md`, in the user's existing polished template, with reviewer-checked accuracy.
+A Claude Code skill (and parallel standalone Python CLI) that, on `/stitch`, takes a pasted JD and produces a tailored .docx + PDF in under ~2 minutes, with bullets sourced strictly from a personal `master.md`, in the user's existing polished template, with reviewer-checked accuracy.
 
 ## Non-goals (v1)
 
@@ -25,7 +25,7 @@ One: the project owner. All design tradeoffs assume single-user, personal workfl
 
 ### Functional
 
-1. **Triggered via `/resume-test`** slash command in Claude Code.
+1. **Triggered via `/stitch`** slash command in Claude Code.
 2. **JD input** by paste in the next message after the trigger (no URL/file argument). The orchestrator first asks for the company name (slugified into `<slug>`) before asking for the JD, then saves the JD and all subsequent artifacts to `.tmp/<slug>/` so per-company runs are isolated.
 3. **Three-stage pipeline:**
    - Analyzer (Sonnet 4.6) — extracts standard ATS schema from JD.
@@ -56,13 +56,13 @@ One: the project owner. All design tradeoffs assume single-user, personal workfl
 
 ## Success criteria
 
-- User runs `/resume-test`, pastes a JD, approves at the gate, gets a usable `resume.pdf` in their `out/` folder — without manually editing the .docx.
+- User runs `/stitch`, pastes a JD, approves at the gate, gets a usable `resume.pdf` in their `out/` folder — without manually editing the .docx.
 - Reviewer's `bullet_issues` array is empty after the (optional) revision pass for ≥ 80% of runs on common JDs.
 - User adopts the pipeline as their default for job applications.
 
 ## Out of scope, deferred
 
-- Cover letter generation as `/resume-test --cover-letter <folder>` (post-v1).
+- Cover letter generation as `/stitch --cover-letter <folder>` (post-v1).
 - Hash-based analyzer cache for repeat JDs.
 - LibreOffice headless mode.
 - Web UI / hosted version.

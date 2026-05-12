@@ -7,7 +7,7 @@ venv/
 .env
 .env.local
 
-# Personal data — never commit these. Users generate via /resume-test --setup
+# Personal data — never commit these. Users generate via /stitch --setup
 # and then customize with their own resume content.
 master.md
 template.docx

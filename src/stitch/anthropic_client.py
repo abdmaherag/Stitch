@@ -47,7 +47,7 @@ def make_client() -> Anthropic:
         "  ANTHROPIC_AUTH_TOKEN  (recommended — uses your Claude Code subscription;\n"
         "                         generate via `claude setup-token`)\n"
         "  ANTHROPIC_API_KEY     (direct API billing)\n"
-        "Or run via the Claude Code skill (`/resume-test`) which uses your\n"
+        "Or run via the Claude Code skill (`/stitch`) which uses your\n"
         "session's OAuth automatically with zero env setup."
     )
 

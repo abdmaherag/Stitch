@@ -1,4 +1,4 @@
-# resume-test
+# stitch
 
 Personal resume tailoring pipeline. Three Claude subagents (analyzer / writer / reviewer) tailor bullets and skills from `master.md` to a pasted JD, fill a fixed `template.docx`, and render PDF via Word.
 
@@ -10,21 +10,24 @@ Personal resume tailoring pipeline. Three Claude subagents (analyzer / writer / 
 
 ## Commands
 
-- `/resume-test`                       — run the full pipeline (paste JD when prompted)
-- `/resume-test --setup`               — scaffold master.md, template-config.yaml, placeholder template.docx
+- `/stitch`                       — run the full pipeline via Claude Code (paste JD when prompted; uses session OAuth, free)
+- `/stitch --setup`               — scaffold master.md, template-config.yaml, placeholder template.docx
+- `python -m stitch --company "X" --jd jd.txt`  — standalone CLI (uses ANTHROPIC_AUTH_TOKEN or ANTHROPIC_API_KEY)
 
 ## Structure
 
 ```
 .claude/
-  skills/resume-test/
-    SKILL.md            # orchestrator — controls pipeline stages
+  skills/stitch/
+    SKILL.md            # orchestrator — controls pipeline stages (Claude Code mode)
     prompts/
       analyzer.md       # Sonnet — extracts standard ATS schema from JD
       writer.md         # Opus   — produces bullets + skills from master.md
       reviewer.md       # Sonnet — audits against master.md, emits severity-tiered issues
   commands/
-    resume-test.md      # slash command entry point
+    stitch.md           # slash command entry point
+src/stitch/             # standalone Python orchestrator (same prompts, Anthropic SDK)
+  pipeline.py / stages.py / anthropic_client.py / slugify.py / cli.py
 master.md               # SOURCE OF TRUTH for all bullets and skills
 template.docx           # polished resume with Jinja slots (docxtpl)
 template-config.yaml    # per-role bullet counts, skill categories

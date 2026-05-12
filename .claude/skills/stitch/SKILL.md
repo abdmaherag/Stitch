@@ -1,10 +1,10 @@
 ---
-name: resume-test
-description: Tailor a resume to a specific job description via a 3-agent pipeline (analyzer / writer / reviewer). Sources bullets from master.md, fill a fixed .docx template, render PDF. Trigger on "/resume-test".
+name: stitch
+description: Tailor a resume to a specific job description via a 3-agent pipeline (analyzer / writer / reviewer). Sources bullets from master.md, fill a fixed .docx template, render PDF. Trigger on "/stitch".
 user-invocable: true
 ---
 
-# resume-test
+# stitch
 
 **Source of truth:** `master.md` (H2 sections per role/project + Skills Inventory)
 **Template:** `template.docx` (Jinja slots via docxtpl, populated by `scripts/fill_and_render.py`)
@@ -44,7 +44,7 @@ Spawn a Task subagent with:
 - `subagent_type`: `general-purpose`
 - `model`: `sonnet`
 - `description`: `JD analyzer`
-- `prompt`: contents of `.claude/skills/resume-test/prompts/analyzer.md`.
+- `prompt`: contents of `.claude/skills/stitch/prompts/analyzer.md`.
 
 ### Stage 2 — Writer subagent (Opus 4.7)
 

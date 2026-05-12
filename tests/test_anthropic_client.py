@@ -10,7 +10,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from resume_test.anthropic_client import (
+from stitch.anthropic_client import (
     Stage,
     _parse_json_lenient,
     call_json,

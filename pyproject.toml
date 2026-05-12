@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "resume-test"
+name = "stitch"
 version = "0.1.0"
 description = "Source-grounded 3-agent resume tailoring pipeline (analyzer / writer / reviewer)."
 requires-python = ">=3.11"
@@ -25,7 +25,7 @@ dev = [
 ]
 
 [project.scripts]
-resume-test = "resume_test.cli:main"
+stitch = "stitch.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

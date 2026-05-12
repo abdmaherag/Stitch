@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from resume_test.stages import has_critical_issues
+from stitch.stages import has_critical_issues
 
 
 def test_no_issues_is_not_critical():
